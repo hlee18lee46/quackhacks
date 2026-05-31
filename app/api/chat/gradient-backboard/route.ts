@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     const {
-      userId = "demo-user",
+      userId = "user123",
       message,
       petName = "Puppie",
       walkDistanceMiles = 0,
@@ -160,10 +160,11 @@ ${message}
 
     return NextResponse.json({
       success: true,
+      reply: aiResponse,
+      aiResponse,
       userId,
       petName,
       message,
-      aiResponse,
       threadId: newThreadId,
       memoryContext,
       memoryEnabled: true,
