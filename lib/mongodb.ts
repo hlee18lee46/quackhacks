@@ -1,14 +1,31 @@
-import { MongoClient } from "mongodb";
+import mongoose from "mongoose";
 
-const uri = process.env.MONGO_URI!;
+const MONGO_URI = process.env.MONGO_URI!;
 
-let client: MongoClient;
+if (!MONGO_URI) {
+  throw new Error("Please define MONGO_URI");
+}
 
-export async function getMongoClient() {
-  if (!client) {
-    client = new MongoClient(uri);
-    await client.connect();
+let cached = (global as any).mongoose;
+
+if (!cached) {
+  cached = (global as any).mongoose = {
+    conn: null,
+    promise: null,
+  };
+}
+
+export async function connectDB() {
+  if (cached.conn) {
+    return cached.conn;
   }
 
-  return client;
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGO_URI).then((mongoose) => {
+      return mongoose;
+    });
+  }
+
+  cached.conn = await cached.promise;
+  return cached.conn;
 }
